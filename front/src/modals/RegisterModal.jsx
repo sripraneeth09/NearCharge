@@ -12,6 +12,14 @@ export default function RegisterModal({ isOpen, onClose, onOpenHostModal, onSucc
   const [password, setPassword] = useState('');
   const [terms, setTerms]     = useState(false);
 
+  function selectType(type) {
+    setRegType(type);
+    if (type === 'host') {
+      onClose();
+      onOpenHostModal();
+    }
+  }
+
   async function registerEVOwner(e) {
     if (e) e.preventDefault();
     console.log("[DEBUG] EV Owner Register button clicked");
