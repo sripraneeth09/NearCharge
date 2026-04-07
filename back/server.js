@@ -23,7 +23,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ['http://localhost:5173', 'http://localhost:4173', 'https://nearcharge.vercel.app'];
 
 app.use(cors({
-  origin: true, // Allow all origins for debugging
+  origin: "*", // Allow all origins as requested
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));

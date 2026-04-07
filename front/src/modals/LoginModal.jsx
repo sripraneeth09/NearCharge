@@ -12,22 +12,43 @@ export default function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegis
 
   if (!isOpen) return null;
 
-  async function handleLogin() {
-    if (!username || !password) { showToast('Please enter username and password', 'error'); return; }
+  async function handleLogin(e) {
+    if (e) e.preventDefault(); // Verify form submission is prevented
+    console.log("[DEBUG] Login button clicked or ENTER pressed");
+
+    if (!username || !password) { 
+      console.log("[DEBUG] Validation failed: Empty username or password");
+      showToast('Please enter username and password', 'error'); 
+      return; 
+    }
 
     if (loginType === 'admin') {
       if (adminCode !== 'admin123') { showToast('Invalid admin code', 'error'); return; }
     }
 
     try {
-      const { data } = await client.post('/api/login', { email: username, password, type: loginType });
-      if (!data.success) { showToast(data.message || 'Login failed', 'error'); return; }
+      console.log(`[DEBUG] Attempting API call to: https://near-charge-api.onrender.com/api/login`);
+      console.log(`[DEBUG] Payload:`, { email: username, type: loginType });
+      
+      const { data } = await client.post('https://near-charge-api.onrender.com/api/login', { 
+        email: username, 
+        password, 
+        type: loginType 
+      });
+
+      console.log("[DEBUG] API Response:", data);
+
+      if (!data.success) { 
+        showToast(data.message || 'Login failed', 'error'); 
+        return; 
+      }
 
       login(data.user);
       onClose();
       showToast(loginType === 'admin' ? 'Welcome, Admin!' : 'Welcome back!', 'success');
       onSuccess(data.user);
     } catch (err) {
+      console.error("[DEBUG] API Error:", err);
       showToast(err.response?.data?.message || 'Login failed', 'error');
     }
   }
@@ -39,7 +60,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegis
           <h3><i className="fas fa-sign-in-alt" style={{ color: 'var(--primary)' }} /> Welcome Back</h3>
           <button className="close-btn" onClick={onClose}><i className="fas fa-times" /></button>
         </div>
-        <div className="modal-body">
+        <form className="modal-body" onSubmit={handleLogin}>
           {/* Role Selector */}
           <div className="user-type-selector role-selector" style={{ marginBottom: '1.5rem' }}>
             {['ev-owner', 'host', 'admin'].map(type => (
@@ -56,12 +77,11 @@ export default function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegis
 
           <div className="form-group">
             <label>Phone Number / Email</label>
-            <input type="text" placeholder="Enter phone or email" value={username} onChange={e => setUsername(e.target.value)} />
+            <input type="text" placeholder="Enter phone or email" value={username} onChange={e => setUsername(e.target.value)} required />
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input type="password" placeholder="Enter password" value={password} onChange={e => setPassword(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleLogin()} />
+            <input type="password" placeholder="Enter password" value={password} onChange={e => setPassword(e.target.value)} required />
           </div>
 
           {loginType === 'admin' && (
@@ -71,7 +91,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegis
             </div>
           )}
 
-          <button className="btn btn-primary btn-lg" style={{ width: '100%', marginBottom: '1rem' }} onClick={handleLogin}>
+          <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginBottom: '1rem' }}>
             <i className="fas fa-sign-in-alt" /> Log In
           </button>
           <p style={{ textAlign: 'center', color: 'var(--gray-600)' }}>
@@ -80,7 +100,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegis
               Sign up
             </a>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );

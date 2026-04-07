@@ -31,8 +31,12 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
     );
   }
 
-  async function submitHost() {
+  async function submitHost(e) {
+    if (e) e.preventDefault();
+    console.log("[DEBUG] Host Register button clicked");
+
     if (!name || !phone || !address || !email || !password) {
+      console.log("[DEBUG] Validation failed: Missing required fields");
       showToast('Please fill in all required fields', 'error'); return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -46,19 +50,30 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
     }
 
     try {
-      const { data } = await client.post('/api/register', {
+      console.log(`[DEBUG] Attempting API call to: https://near-charge-api.onrender.com/api/register`);
+      console.log(`[DEBUG] Payload:`, { name, email, type: 'host' });
+
+      const { data } = await client.post('https://near-charge-api.onrender.com/api/register', {
         name, phone, email, password, type: 'host',
         address, socketType, setupType,
         chargerType: chargerType || '',
         lat: coordsRef.current?.lat || null,
         lng: coordsRef.current?.lng || null
       });
-      if (!data.success) { showToast(data.message || 'Registration failed', 'error'); return; }
+
+      console.log("[DEBUG] API Response:", data);
+
+      if (!data.success) { 
+        showToast(data.message || 'Registration failed', 'error'); 
+        return; 
+      }
+
       login(data.user);
       onClose();
       showToast('Registration submitted! Team will verify your location.', 'success');
       onSuccess(data.user);
     } catch (err) {
+      console.error("[DEBUG] API Error:", err);
       showToast(err.response?.data?.message || 'Registration failed', 'error');
     }
   }
@@ -71,9 +86,9 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
       <div className="modal modal-large">
         <div className="modal-header">
           <h3><i className="fas fa-home" style={{ color: 'var(--primary)' }} /> Register as Host</h3>
-          <button className="close-btn" onClick={onClose}><i className="fas fa-times" /></button>
+          <button type="button" className="close-btn" onClick={onClose}><i className="fas fa-times" /></button>
         </div>
-        <div className="modal-body">
+        <form className="modal-body" onSubmit={submitHost}>
           <div style={{ background: 'var(--primary-soft)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem' }}>
             <p style={{ color: 'var(--primary-dark)' }}><i className="fas fa-lightbulb" /> <strong>Earn up to ₹20,000/month!</strong> Any home or shop can become a charging point.</p>
           </div>
@@ -81,11 +96,11 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
           <div className="form-row">
             <div className="form-group">
               <label>Full Name</label>
-              <input type="text" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
+              <input type="text" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} required />
             </div>
             <div className="form-group">
               <label>Phone Number</label>
-              <input type="tel" placeholder="10-digit number" maxLength="10" value={phone} onChange={e => setPhone(e.target.value)} />
+              <input type="tel" placeholder="10-digit number" maxLength="10" value={phone} onChange={e => setPhone(e.target.value)} required />
             </div>
           </div>
 
@@ -96,7 +111,7 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
                 <i className="fas fa-location-crosshairs" /> Detect My Location
               </button>
             </div>
-            <textarea rows="2" placeholder="House/Shop number, Street, Area, City" value={address} onChange={e => setAddress(e.target.value)} style={{ width: '100%', padding: '0.875rem 1.25rem', border: '2px solid var(--gray-200)', borderRadius: '0.75rem', fontFamily: 'inherit', fontSize: '1rem' }} />
+            <textarea rows="2" placeholder="House/Shop number, Street, Area, City" value={address} onChange={e => setAddress(e.target.value)} required style={{ width: '100%', padding: '0.875rem 1.25rem', border: '2px solid var(--gray-200)', borderRadius: '0.75rem', fontFamily: 'inherit', fontSize: '1rem' }} />
             {locationCaptured && (
               <div style={{ fontSize: '0.8rem', color: 'var(--primary-dark)', marginTop: '0.25rem' }}>
                 <i className="fas fa-check-circle" /> Ready-point captured!
@@ -107,11 +122,11 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
           <div className="form-row">
             <div className="form-group">
               <label>Email Address</label>
-              <input type="email" placeholder="your@example.com" value={email} onChange={e => setEmail(e.target.value)} />
+              <input type="email" placeholder="your@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
             <div className="form-group">
               <label>Create Password</label>
-              <input type="password" placeholder="Min 8 characters" value={password} onChange={e => setPassword(e.target.value)} />
+              <input type="password" placeholder="Min 8 characters" value={password} onChange={e => setPassword(e.target.value)} required />
             </div>
           </div>
 
@@ -179,7 +194,7 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
             </div>
           </div>
 
-          <button className="btn btn-primary btn-lg" style={{ width: '100%', marginBottom: '1rem' }} onClick={submitHost}>
+          <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginBottom: '1rem' }}>
             <i className="fas fa-check-circle" /> Submit for Verification
           </button>
           
@@ -189,8 +204,9 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
               Log in
             </a>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );
 }
+
