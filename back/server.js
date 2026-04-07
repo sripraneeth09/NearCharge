@@ -17,23 +17,25 @@ const app      = express();
 const PORT     = process.env.PORT     || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/NearCharge';
 
-// ── CORS ─────────────────────────────────────────────────────────────────────
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-  : ['http://localhost:5173', 'http://localhost:4173', 'https://nearcharge.vercel.app'];
-
-app.use(cors({
-  origin: "*", // Allow all origins as requested
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// CORS Debugging Middleware
+// ── Bulletproof CORS (Manual + Package) ──────────────────────────────────────
 app.use((req, res, next) => {
-  console.log(`[DEBUG] Request from Origin: ${req.headers.origin || 'No Origin'}`);
+  const origin = req.headers.origin;
+  res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
   next();
 });
-app.options('*', cors());
+
+app.use(cors({
+  origin: true, // Echoes the request origin
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logger);
