@@ -50,10 +50,10 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
     }
 
     try {
-      console.log(`[DEBUG] Attempting API call to: https://near-charge-api.onrender.com/api/register`);
+      console.log(`[DEBUG] Attempting API call to: /api/register (Base: https://nearcharge-backend.onrender.com)`);
       console.log(`[DEBUG] Payload:`, { name, email, type: 'host' });
 
-      const { data } = await client.post('https://near-charge-api.onrender.com/api/register', {
+      const { data } = await client.post('/api/register', {
         name, phone, email, password, type: 'host',
         address, socketType, setupType,
         chargerType: chargerType || '',

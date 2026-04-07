@@ -27,10 +27,10 @@ export default function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegis
     }
 
     try {
-      console.log(`[DEBUG] Attempting API call to: https://near-charge-api.onrender.com/api/login`);
+      console.log(`[DEBUG] Attempting API call to: /api/login (Base: https://nearcharge-backend.onrender.com)`);
       console.log(`[DEBUG] Payload:`, { email: username, type: loginType });
       
-      const { data } = await client.post('https://near-charge-api.onrender.com/api/login', { 
+      const { data } = await client.post('/api/login', { 
         email: username, 
         password, 
         type: loginType 
