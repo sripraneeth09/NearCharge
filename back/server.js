@@ -24,7 +24,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
   origin: (origin, cb) => {
-    // Allow requests with no origin (e.g. Render health checks, curl)
+    // Allow requests with no origin (e.g. system health checks, curl)
     if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
     return cb(new Error('Not allowed by CORS'));
   },
