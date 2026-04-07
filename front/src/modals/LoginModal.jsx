@@ -54,7 +54,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess, onSwitchToRegis
   }
 
   return (
-    <div className="modal-overlay active" onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="modal-overlay active" style={{ zIndex: 3000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
           <h3><i className="fas fa-sign-in-alt" style={{ color: 'var(--primary)' }} /> Welcome Back</h3>

@@ -127,13 +127,7 @@ export default function App() {
       {view === 'host-waiting' && <HostWaiting onShowLanding={showLanding} onLogout={handleLogout} onApproved={() => setView('host')} />}
       {view === 'admin'        && <AdminDashboard onShowLanding={showLanding} onLogout={handleLogout} />}
 
-      {/* Modals */}
-      <LoginModal
-        isOpen={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onSuccess={afterLogin}
-        onSwitchToRegister={() => { setLoginOpen(false); setRegisterOpen(true); }}
-      />
+      {/* Modals - Rendered in order of priority (Last = Top) */}
       <RegisterModal
         isOpen={registerOpen}
         onClose={() => setRegisterOpen(false)}
@@ -146,6 +140,12 @@ export default function App() {
         onClose={() => setHostRegOpen(false)}
         onSuccess={afterRegister}
         onSwitchToLogin={() => { setHostRegOpen(false); setLoginOpen(true); }}
+      />
+      <LoginModal
+        isOpen={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSuccess={afterLogin}
+        onSwitchToRegister={() => { setLoginOpen(false); setRegisterOpen(true); }}
       />
 
       {/* Global Toast */}
