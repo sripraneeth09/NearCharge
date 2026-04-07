@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://nearcharge-backend.onrender.com',
+  baseURL: 'https://nearcharge-backend.onrender.com',
   headers: { 'Content-Type': 'application/json' }
 });
 
