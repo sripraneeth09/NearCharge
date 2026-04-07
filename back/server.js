@@ -44,7 +44,21 @@ app.use('/api/stats',        statsRoutes);    // GET /api/stats
 app.use('/api/user',         userRoutes);     // GET /api/user/:id
 
 // ── Health check ─────────────────────────────────────────────────────────────
-app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
+app.get('/api/health', (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const states = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+
+  res.json({
+    status: 'ok',
+    database: states[dbState] || 'unknown',
+    timestamp: new Date()
+  });
+});
 
 // ── DB + Server start ─────────────────────────────────────────────────────────
 mongoose.set("strictQuery", false);
