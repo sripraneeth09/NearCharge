@@ -61,7 +61,7 @@ export default function RegisterModal({ isOpen, onClose, onOpenHostModal, onSucc
   }
 
   return (
-    <div className="modal-overlay active" style={{ zIndex: 2900 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={`modal-overlay ${isOpen ? 'active' : ''}`} style={{ zIndex: 2900 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
           <h3><i className="fas fa-user-plus" style={{ color: 'var(--primary)' }} /> Join Near Charge</h3>

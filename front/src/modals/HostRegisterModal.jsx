@@ -82,7 +82,7 @@ export default function HostRegisterModal({ isOpen, onClose, onSuccess, onSwitch
   const chargers = ['type1', 'type2', 'ccs2', 'bharat'];
 
   return (
-    <div className="modal-overlay active" style={{ zIndex: 2800 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={`modal-overlay ${isOpen ? 'active' : ''}`} style={{ zIndex: 2800 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal modal-large">
         <div className="modal-header">
           <h3><i className="fas fa-home" style={{ color: 'var(--primary)' }} /> Register as Host</h3>

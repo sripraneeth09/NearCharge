@@ -50,9 +50,17 @@ export default function App() {
   }, [view, currentUserType, currentUser?.status]);
 
   // ── Modal State ───────────────────────────────────────────────────────
-  const [loginOpen,    setLoginOpen]    = useState(false);
-  const [registerOpen, setRegisterOpen] = useState(false);
-  const [hostRegOpen,  setHostRegOpen]  = useState(false);
+  const [activeModal, setActiveModal] = useState(null); // 'login', 'register', 'host' or null
+
+  // Ensure clean startup state
+  useEffect(() => {
+    setActiveModal(null);
+    console.log("[DEBUG] Clean App mount: Register and Login modals are closed by default.");
+    // Optional: Clear old session data to prevent state haunting
+    if (sessionStorage.getItem('nc_view') === 'landing') {
+      sessionStorage.removeItem('nc_fc_step');
+    }
+  }, []);
 
   // ── Navigation Helpers ────────────────────────────────────────────────
   function showLanding() {
@@ -65,8 +73,15 @@ export default function App() {
     }
   }
   function showFindCharging() {
-    if (!currentUser) { setLoginOpen(true); showToast('Please login to find charging stations', 'warning'); return; }
-    if (currentUserType !== 'ev-owner') { showToast('Please login as EV Owner to find charging', 'error'); return; }
+    if (!currentUser) { 
+      setActiveModal('login'); 
+      showToast('Please login to find charging stations', 'warning'); 
+      return; 
+    }
+    if (currentUserType !== 'ev-owner') { 
+      showToast('Please login as EV Owner to find charging', 'error'); 
+      return; 
+    }
     
     // If there's an active request (pending or accepted), DON'T clear the session
     const activeStat = sessionStorage.getItem('nc_fc_rstat');
@@ -84,7 +99,6 @@ export default function App() {
     sessionStorage.removeItem('nc_fc_shost');
     sessionStorage.removeItem('nc_fc_rstat');
     sessionStorage.removeItem('nc_fc_rid');
-    // Note: We keep nc_fc_coords (location) so you don't have to detect again if you don't want to
     
     navigateTo('find-charging');
   }
@@ -105,47 +119,56 @@ export default function App() {
     showToast('Logged out successfully', 'info'); 
   }
 
-  // ── After Login ───────────────────────────────────────────────────────
+  // ── After Login/Register ──────────────────────────────────────────────
   function afterLogin(user) {
+    setActiveModal(null);
     if (user.type === 'admin')    { navigateTo('admin');        return; }
     if (user.type === 'host')     { navigateTo(user.status === 'pending' ? 'host-waiting' : 'host'); return; }
     if (user.type === 'ev-owner') { navigateTo('landing');      return; }
   }
 
-  // ── After Register ────────────────────────────────────────────────────
   function afterRegister(user) {
+    setActiveModal(null);
     if (user.type === 'host')     navigateTo('host-waiting');
     else                          navigateTo('landing');
   }
 
   return (
     <>
-      {view === 'landing'      && <Landing onLogin={() => setLoginOpen(true)} onRegister={() => setRegisterOpen(true)} onFindCharging={showFindCharging} onShowLanding={showLanding} onShowProfile={showProfile} />}
+      {view === 'landing' && (
+        <Landing 
+          onLogin={() => setActiveModal('login')} 
+          onRegister={() => setActiveModal('register')} 
+          onFindCharging={showFindCharging} 
+          onShowLanding={showLanding} 
+          onShowProfile={showProfile} 
+        />
+      )}
       {view === 'find-charging' && <FindCharging onShowLanding={showLanding} onLogout={handleLogout} onShowProfile={showProfile} />}
       {view === 'ev-owner'     && <EVOwnerDashboard onShowLanding={showLanding} onLogout={handleLogout} />}
       {view === 'host'         && <HostDashboard onShowLanding={showLanding} onLogout={handleLogout} />}
       {view === 'host-waiting' && <HostWaiting onShowLanding={showLanding} onLogout={handleLogout} onApproved={() => setView('host')} />}
       {view === 'admin'        && <AdminDashboard onShowLanding={showLanding} onLogout={handleLogout} />}
 
-      {/* Modals - Rendered in order of priority (Last = Top) */}
+      {/* Modals - Only one can be open at a time */}
       <RegisterModal
-        isOpen={registerOpen}
-        onClose={() => setRegisterOpen(false)}
-        onOpenHostModal={() => setHostRegOpen(true)}
+        isOpen={activeModal === 'register'}
+        onClose={() => setActiveModal(null)}
+        onOpenHostModal={() => setActiveModal('host')}
         onSuccess={afterRegister}
-        onSwitchToLogin={() => { setRegisterOpen(false); setLoginOpen(true); }}
+        onSwitchToLogin={() => setActiveModal('login')}
       />
       <HostRegisterModal
-        isOpen={hostRegOpen}
-        onClose={() => setHostRegOpen(false)}
+        isOpen={activeModal === 'host'}
+        onClose={() => setActiveModal(null)}
         onSuccess={afterRegister}
-        onSwitchToLogin={() => { setHostRegOpen(false); setLoginOpen(true); }}
+        onSwitchToLogin={() => setActiveModal('login')}
       />
       <LoginModal
-        isOpen={loginOpen}
-        onClose={() => setLoginOpen(false)}
+        isOpen={activeModal === 'login'}
+        onClose={() => setActiveModal(null)}
         onSuccess={afterLogin}
-        onSwitchToRegister={() => { setLoginOpen(false); setRegisterOpen(true); }}
+        onSwitchToRegister={() => setActiveModal('register')}
       />
 
       {/* Global Toast */}
