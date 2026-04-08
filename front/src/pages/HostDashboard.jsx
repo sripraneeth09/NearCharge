@@ -79,7 +79,7 @@ export default function HostDashboard({ onShowLanding, onLogout }) {
     <div className="dashboard" style={{ display: 'block' }}>
       {/* Header */}
       <div className="dashboard-header">
-        <div className="logo" onClick={onShowLanding}><i className="fas fa-bolt" /> Near Charge</div>
+        <div className="logo" onClick={onShowLanding}><i className="fas fa-bolt" /> <span className="logo-text">Near Charge</span></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           {/* Online / Offline toggle */}
           <div
@@ -88,7 +88,7 @@ export default function HostDashboard({ onShowLanding, onLogout }) {
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: isActive ? 'var(--primary)' : 'var(--gray-400)' }} />
             <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{isActive ? 'ONLINE' : 'OFFLINE'}</span>
           </div>
-          <span style={{ fontWeight: 600 }}>{currentUser?.name}</span>
+          <span className="user-name-text" style={{ fontWeight: 600 }}>{currentUser?.name}</span>
           <button className="btn btn-outline btn-sm" onClick={onLogout}>Logout</button>
         </div>
       </div>

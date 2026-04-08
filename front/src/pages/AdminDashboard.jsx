@@ -52,10 +52,10 @@ export default function AdminDashboard({ onShowLanding, onLogout }) {
     <div className="dashboard" style={{ display: 'block' }}>
       {/* Header */}
       <div className="dashboard-header admin-header">
-        <div className="logo" style={{ color: 'white' }} onClick={onShowLanding}><i className="fas fa-bolt" /> Near Charge Admin</div>
+        <div className="logo" style={{ color: 'white' }} onClick={onShowLanding}><i className="fas fa-bolt" /> <span className="logo-text">Near Charge Admin</span></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span className="admin-badge">ADMIN</span>
-          <span style={{ fontWeight: 600 }}>{currentUser?.name}</span>
+          <span className="badge admin-badge">ADMIN</span>
+          <span className="user-name-text" style={{ fontWeight: 600 }}>{currentUser?.name}</span>
           <button className="btn btn-outline btn-sm" style={{ borderColor: 'white', color: 'white' }} onClick={onLogout}>Logout</button>
         </div>
       </div>

@@ -8,7 +8,7 @@ export default function Landing({ onLogin, onRegister, onFindCharging, onShowLan
       <Navbar onLogin={onLogin} onRegister={onRegister} onShowLanding={onShowLanding} onShowProfile={onShowProfile} />
 
       {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="hero" style={{ marginTop: '80px' }}>
+      <section className="hero">
         <div className="hero-content">
           <h1>Power Up Anywhere, <span>Anytime</span></h1>
           <p>India's first decentralized EV charging network. Connect with nearby homes and shops for emergency charging — whether you have your own charger or need one.</p>
@@ -143,10 +143,10 @@ export default function Landing({ onLogin, onRegister, onFindCharging, onShowLan
 
       {/* ── CTA ────────────────────────────────────────────────── */}
       <section className="cta">
-        <div style={{ maxWidth: 700, margin: '0 auto' }}>
+        <div className="cta-container">
           <h2>Join India's Charging Revolution</h2>
           <p>Whether you need emergency power or want to earn from your electricity, Near Charge connects you.</p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+          <div className="cta-buttons">
             {!currentUser ? (
               <>
                 <button className="btn btn-white btn-lg" onClick={onRegister}><i className="fas fa-user-plus" /> Get Started Free</button>

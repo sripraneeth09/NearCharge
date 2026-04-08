@@ -1,20 +1,20 @@
 require('dotenv').config();
-const express  = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
-const cors     = require('cors');
+const cors = require('cors');
 
-const logger   = require('./middleware/logger');
+const logger = require('./middleware/logger');
 const { seedAdmin, seedHosts, seedEVOwners, seedRequests } = require('./seed');
 
 // Route modules
-const authRoutes         = require('./routes/auth');
-const hostRoutes         = require('./routes/hosts');
-const requestRoutes      = require('./routes/requests');
-const statsRoutes        = require('./routes/stats');
-const userRoutes         = require('./routes/users');
+const authRoutes = require('./routes/auth');
+const hostRoutes = require('./routes/hosts');
+const requestRoutes = require('./routes/requests');
+const statsRoutes = require('./routes/stats');
+const userRoutes = require('./routes/users');
 
-const app      = express();
-const PORT     = process.env.PORT     || 5000;
+const app = express();
+const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/NearCharge';
 
 // ── Bulletproof CORS (Manual + Package) ──────────────────────────────────────
@@ -41,11 +41,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(logger);
 
 // ── API Routes ───────────────────────────────────────────────────────────────
-app.use('/api',              authRoutes);     // POST /api/register, POST /api/login
-app.use('/api/hosts',        hostRoutes);     // GET /api/hosts, PATCH /api/hosts/:id/approve ...
-app.use('/api/requests',     requestRoutes);
-app.use('/api/stats',        statsRoutes);    // GET /api/stats
-app.use('/api/user',         userRoutes);     // GET /api/user/:id
+app.use('/api', authRoutes);     // POST /api/register, POST /api/login
+app.use('/api/hosts', hostRoutes);     // GET /api/hosts, PATCH /api/hosts/:id/approve ...
+app.use('/api/requests', requestRoutes);
+app.use('/api/stats', statsRoutes);    // GET /api/stats
+app.use('/api/user', userRoutes);     // GET /api/user/:id
 
 // ── Health check ─────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
@@ -66,9 +66,17 @@ app.get('/api/health', (req, res) => {
 
 // ── DB + Server start ─────────────────────────────────────────────────────────
 mongoose.set("strictQuery", false);
-mongoose.connect(MONGO_URI)
+
+if (MONGO_URI.includes('127.0.0.1') || MONGO_URI.includes('localhost')) {
+  console.log('⚠️ [WARNING] Using LOCAL database URI. Ensure MONGO_URI is set in Render Environment Variables for production.');
+}
+
+console.log('⏳ Connecting to MongoDB...');
+mongoose.connect(MONGO_URI, {
+  serverSelectionTimeoutMS: 5000 // 5 second timeout for DB selection
+})
   .then(async () => {
-    console.log('✅ MongoDB connected successfully to:', MONGO_URI);
+    console.log('✅ MongoDB connected successfully!');
 
     // Only seed in development — never overwrite production data
     if (process.env.NODE_ENV !== 'production') {
@@ -81,13 +89,13 @@ mongoose.connect(MONGO_URI)
       } catch (seedErr) {
         console.error('❌ Seeding Error:', seedErr);
       }
-    } else {
-      console.log('🚀 Production mode — skipping seed.');
     }
 
-    app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
   .catch(err => {
     console.error('❌ MongoDB Connection Error:', err.message);
-    process.exit(1);
+    console.log('👉 ACTION REQUIRED: Check if your MONGO_URI is correct in the Render dashboard.');
+    // Allow the server to start even if DB fails, so /api/health can report it
+    app.listen(PORT, () => console.log(`🚀 Server started (DEGRADED MODE - No DB) on port ${PORT}`));
   });

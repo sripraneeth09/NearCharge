@@ -52,10 +52,10 @@ export default function EVOwnerDashboard({ onShowLanding, onLogout }) {
     <div className="dashboard" style={{ display: 'block' }}>
       {/* Header */}
       <div className="dashboard-header">
-        <div className="logo" onClick={onShowLanding}><i className="fas fa-bolt" /> Near Charge</div>
+        <div className="logo" onClick={onShowLanding}><i className="fas fa-bolt" /> <span className="logo-text">Near Charge</span></div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ color: 'var(--gray-600)' }}><i className="fas fa-car" /> EV Owner</span>
-          <span style={{ fontWeight: 600 }}>{currentUser?.name}</span>
+          <span className="badge" style={{ color: 'var(--gray-600)' }}><i className="fas fa-car" /> EV Owner</span>
+          <span className="user-name-text" style={{ fontWeight: 600 }}>{currentUser?.name}</span>
           <button className="btn btn-outline btn-sm" onClick={onLogout}>Logout</button>
         </div>
       </div>

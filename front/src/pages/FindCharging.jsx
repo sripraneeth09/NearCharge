@@ -252,10 +252,11 @@ export default function FindCharging({ onShowLanding, onLogout, onShowProfile })
   return (
     <div className="find-charging-page">
       <div className="charging-header">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 1400, margin: '0 auto' }}>
-          <div className="logo" onClick={onShowLanding}><i className="fas fa-bolt" /> Near Charge</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ color: 'var(--gray-600)', fontWeight: 600 }}>{currentUser?.name}</span>
+        <div className="charging-header-container">
+          <div className="logo" onClick={onShowLanding}><i className="fas fa-bolt" /> <span className="logo-text">Near Charge</span></div>
+          <div className="charging-header-actions">
+            <span className="user-name" style={{ display: 'none' /* Will be managed by CSS if needed, but adding user-name-text */ }}>{currentUser?.name}</span>
+            <span className="user-name-text" style={{ fontWeight: 600, color: 'var(--gray-600)' }}>{currentUser?.name}</span>
             <button className="btn btn-primary btn-sm" onClick={onShowProfile}>Profile</button>
             <button className="btn btn-outline btn-sm" onClick={onLogout}>Logout</button>
           </div>
@@ -265,14 +266,14 @@ export default function FindCharging({ onShowLanding, onLogout, onShowProfile })
       {step === 'init' && (
         <div className="charging-init">
           <h3>Do you have your own charger?</h3>
-          <div className="user-type-selector charging-selector" style={{ marginBottom: '1rem' }}>
+          <div className="user-type-selector charging-selector">
             {[
               { id: 'own',  icon: 'fa-plug', title: 'Yes, I have my charger', desc: "Show all hosts with compatible sockets." },
               { id: 'need', icon: 'fa-charging-station', title: 'No, I need a charger', desc: 'Show only hosts providing chargers.' }
             ].map(o => (
               <div key={o.id} className={`user-type-option ${chargingPref === o.id ? 'active' : ''}`} onClick={() => setChargingPref(o.id)}>
                 <i className={`fas ${o.icon}`} /><h3>{o.title}</h3>
-                <p style={{ color: 'var(--gray-600)' }}>{o.desc}</p>
+                <p>{o.desc}</p>
               </div>
             ))}
           </div>
